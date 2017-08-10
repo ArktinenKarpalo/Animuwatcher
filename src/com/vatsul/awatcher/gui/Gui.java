@@ -53,6 +53,7 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -515,13 +516,11 @@ public class Gui extends Application {
 		
 		descriptionArea = new TextArea();
 		leftVBox.getChildren().add(descriptionArea);
-		VBox.setVgrow(descriptionArea, Priority.ALWAYS);
-		HBox.setHgrow(descriptionArea, Priority.ALWAYS);
 		descriptionArea.getStyleClass().add("descriptionArea");
 		descriptionArea.setEditable(false);
 		descriptionArea.setWrapText(true);
-		descriptionArea.setMaxHeight(Double.MAX_VALUE);
 		descriptionArea.setPrefWidth(300);
+		descriptionArea.setPrefRowCount(Integer.MAX_VALUE);
 		descriptionArea.setText("Animuwatcher is currently under development.");;
 		// END OF LEFT BOX
 		
