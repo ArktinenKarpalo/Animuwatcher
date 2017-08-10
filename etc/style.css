@@ -1,0 +1,25 @@
+.titleLabel {
+	-fx-font-weight: bold;
+	-fx-font-size: 16px;
+}
+
+.root {
+	-fx-font-family: Ubuntu;
+}
+
+.malTableColumnTitle {
+	-fx-alignment: CENTER;
+}
+
+.descriptionArea {
+	-fx-font-family: Ubuntu;
+	-fx-font-size: 16px;
+}
+
+.optionsLeftBox {
+	-fx-spacing: 11px;
+}
+
+.titleLbl {
+	-fx-alignment: center;
+}
