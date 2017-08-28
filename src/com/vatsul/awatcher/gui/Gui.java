@@ -48,12 +48,12 @@ import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToolBar;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -227,7 +227,7 @@ public class Gui extends Application {
 								// TODO Auto-generated catch block
 								e.printStackTrace();
 							}
-						}).start();;
+						}).start();
 					}
 				}
 			}
@@ -235,6 +235,17 @@ public class Gui extends Application {
 		ImageView playIcon = new ImageView(new Image(getClass().getClassLoader().getResourceAsStream("playIcon.png")));
 		playBtn.setGraphic(playIcon);
 		topToolBar.getItems().add(playBtn);
+		
+		ToggleButton listenMediaplayers = new ToggleButton("Toggle autoview");
+		listenMediaplayers.setTooltip(new Tooltip("Toggle to listen running mediaplayer instances for running episodes"));
+		listenMediaplayers.setSelected(Main.config.getListenMediaplayers());
+		listenMediaplayers.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+					Main.config.setListenMediaplayers(listenMediaplayers.isSelected());
+			}
+		});
+		topToolBar.getItems().add(listenMediaplayers);
 		
 		// Used to fill excess space between left and right side widgets
 		Pane spaceFillerPane = new Pane();

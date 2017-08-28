@@ -30,6 +30,7 @@ public class Config {
 			setValue("vlcPassword", "password");
 			setValue("markOnMalPercentage", "0.90");
 			setValue("disableWelcome", "0");
+			setValue("listenMediaplayers", "0");
 		}
 	}
 	
@@ -56,6 +57,22 @@ public class Config {
 	
 	private String getValue(Object key) {
 		return (String)config.get(key);
+	}
+	
+	public void setListenMediaplayers(boolean listenMediaplayers) {
+		if(listenMediaplayers) {
+			setValue("listenMediaplayers", "1");
+		} else {
+			setValue("listenMediaplayers", "0");
+		}
+	}
+	
+	public boolean getListenMediaplayers() {
+		if(Integer.parseInt(getValue("listenMediaplayers"))==1) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 	
 	public File getAnimeDirectory() {
