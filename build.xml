@@ -19,7 +19,7 @@
 		<jar destfile="build/Animuwatch.jar">
 			<zipgroupfileset dir="lib" includes="*.jar" />
 			<fileset dir="icons" includes="*.png" />
-			<fileset dir="etc" includes="style.css" />
+			<fileset dir="etc" includes="style.css, Ubuntu-R.ttf" />
 			<manifest>
 				<attribute name="Main-Class" value="com.vatsul.awatcher.Main" />
 				<attribute name="Class-Path" value="." />
