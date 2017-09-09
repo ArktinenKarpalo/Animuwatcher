@@ -14,6 +14,7 @@ public class Main {
 	public static AnidbConnection anidbConn;
 	public static Config config;
 	public static Database database;
+	public static Gui gui;
 	
 	public static InetSocketAddress AnidbUDPSERVER = new InetSocketAddress("api.anidb.net", 9000);
 	public static InetSocketAddress AnidbHTTPSERVER = new InetSocketAddress("api.anidb.net", 9001);
@@ -25,6 +26,8 @@ public class Main {
 		/*MalApi.updateMyAnimeList();
 		MalApi.cacheSynopsesToDB();
 		Indexer.cacheThumbnails();*/
+		VlcConnect vlcThread = new VlcConnect();
+		vlcThread.start();
 		Application.launch(Gui.class, args);
 		if(anidbConn!=null) {
 			anidbConn.close();

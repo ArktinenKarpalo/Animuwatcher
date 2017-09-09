@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URLEncoder;
 import java.util.Properties;
 
 public class Config {
@@ -59,6 +60,14 @@ public class Config {
 		return (String)config.get(key);
 	}
 	
+	public void setVlcPort(int port) {
+		setValue("vlcPort", port+"");
+	}
+	
+	public int getVlcPort() {
+		return Integer.parseInt(getValue("vlcPort"));
+	}
+	
 	public void setListenMediaplayers(boolean listenMediaplayers) {
 		if(listenMediaplayers) {
 			setValue("listenMediaplayers", "1");
@@ -89,14 +98,6 @@ public class Config {
 	
 	public void setAnimeDirectory(File dir) {
 		setValue("animeDirectory", dir.getAbsolutePath());
-	}
-	
-	public int getVlcPort() {
-		return Integer.parseInt(getValue("vlcPort"));
-	}
-	
-	public void setVlcPort(int port) {
-		setValue("vlcPort", ""+port);
 	}
 	
 	public void setMalUsername(String username) {
@@ -132,19 +133,19 @@ public class Config {
 	}
 	
 	public void setVlcPassword(String password) {
-		setValue("vlcPassword", password);
+		setValue("vlcPassword", password.replaceAll(" ", ""));
 	}
 	
 	public String getVlcPassword() {
 		return getValue("vlcPassword");
 	}
 	
-	public void setMarkOnMalPercentage(String password) {
-		setValue("markOnMalPercentage", password);
+	public void setMarkOnMalPercentage(Double percentage) {
+		setValue("markOnMalPercentage", ""+percentage);
 	}
 	
-	public long getMarkOnMalPercentage() {
-		return Long.parseLong(getValue("markOnMalPercentage"));
+	public Double getMarkOnMalPercentage() {
+		return Double.parseDouble(getValue("markOnMalPercentage"));
 	}
 	
 	public boolean getDisableWelcome() {

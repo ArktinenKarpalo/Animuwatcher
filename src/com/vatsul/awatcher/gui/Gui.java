@@ -1,14 +1,17 @@
 package com.vatsul.awatcher.gui;
 
 import java.awt.Desktop;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 import com.vatsul.awatcher.Main;
@@ -110,6 +113,7 @@ public class Gui extends Application {
 	public static boolean scanning = false;
 
 	public Gui() {
+		Main.gui = this;
 		initializeMalRowData();
 	}
 	
@@ -218,16 +222,48 @@ public class Gui extends Application {
 				if(selectedMalID>0) {
 					int aid = Main.database.getAid(selectedMalID);
 					int epNum = selectedWatchedEps;
-					File nextEpisode = Main.database.getFileByAidEp(aid, epNum+1);
-					if(nextEpisode!=null) {
+					ArrayList<File> playlist = new ArrayList<File>();
+					int i = 0;
+					while(true) {
+						i++;
+						File nextEpisode = Main.database.getFileByAidEp(aid, epNum+i);
+						if(nextEpisode!=null) {
+							playlist.add(nextEpisode);
+						} else {
+							break;
+						}
+					}
+					if(playlist.size()>0) {
 						new Thread(() -> {
 							try {
-								Desktop.getDesktop().open(nextEpisode);
+								ArrayList<String> vlcArgs = new ArrayList<String>();
+								vlcArgs.add("vlc");
+								vlcArgs.add("-I");
+								vlcArgs.add("qt");
+								vlcArgs.add("--extraintf");
+								vlcArgs.add("http");
+								vlcArgs.add("--http-password");
+								vlcArgs.add(Main.config.getVlcPassword());
+								vlcArgs.add("--http-port");
+								vlcArgs.add(Main.config.getVlcPort()+"");
+								vlcArgs.add("--one-instance");
+								for(File f:playlist) {
+									vlcArgs.add(f.getAbsolutePath());
+								}
+								ProcessBuilder pb = new ProcessBuilder(vlcArgs);
+								pb.redirectErrorStream(true);
+								Process p = pb.start();
+						        BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream()));
+						        String line;
+						        while (true) {
+						            line = r.readLine();
+						            if (line == null) { break; }
+						            System.out.println("VLC: "+line);
+						        }
 							} catch (IOException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
+							e.printStackTrace();
 							}
-						}).start();
+						}).start();;
 					}
 				}
 			}
@@ -919,7 +955,7 @@ public class Gui extends Application {
 		Platform.runLater(() -> scanVariousBtn.setDisable(false));
 	}
 	
-	private void updateDatabaseData() {
+	public void updateDatabaseData() {
 		Platform.runLater(() -> scanAnimeBtn.setDisable(true));
 		Platform.runLater(() -> scanVariousBtn.setDisable(true));
 		scanning = true;
