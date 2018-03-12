@@ -134,7 +134,7 @@ public class Indexer {
 			String mainTitle = null;
 			String type;
 			String startDate;
-			String endDate;
+			String endDate="???";
 			String thumbnail;
 			String description;
 			int totalEp;
@@ -157,7 +157,8 @@ public class Indexer {
 			startDate = nl.item(0).getTextContent();
 			
 			nl = doc.getElementsByTagName("enddate");
-			endDate = nl.item(0).getTextContent();
+			if(nl.item(0)!=null)
+				endDate = nl.item(0).getTextContent();
 			
 			nl = doc.getElementsByTagName("picture");
 			thumbnail = nl.item(0).getTextContent();
