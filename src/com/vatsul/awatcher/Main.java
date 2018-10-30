@@ -23,40 +23,11 @@ public class Main {
 	public static void main(String args[]) throws IOException {
 		config = new Config();
 		database = new Database();
-		/*MalApi.updateMyAnimeList();
-		MalApi.cacheSynopsesToDB();
-		Indexer.cacheThumbnails();*/
 		VlcConnect vlcThread = new VlcConnect();
 		vlcThread.start();
 		Application.launch(Gui.class, args);
 		if(anidbConn!=null) {
 			anidbConn.close();
 		}
-		
-		/*System.out.println("Monitoring vlc...");
-		while(true) {
-			try {
-				Thread.sleep(5000);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-			Double playbackPos = VlcConnect.getPlaybackPosition(config.getVlcPort(), config.getVlcPassword());
-			if(playbackPos>=0.90) {
-				File currentTrack = VlcConnect.getCurrentTrack(config.getVlcPort(), config.getVlcPassword());
-				if(updatedEps.contains(currentTrack))
-					continue;
-				int aid = database.getAid(currentTrack);
-				int malID = database.getMalID(aid);
-				int watchedEpMal = MalApi.getWatchedEpisodes(malID, config.getMalUsername());
-				String currentEpNum = database.getEpNum(currentTrack);
-				if(currentEpNum.matches("^\\d+$")) { // Non-episodes could be labeled as T36
-					if((Integer.parseInt(currentEpNum)-1)==watchedEpMal) {
-						MalApi.updateAnimeList(malID,Integer.parseInt(currentEpNum));
-					}
-					updatedEps.add(currentTrack);
-				}
-			}
-		}*/
-		
 	}
 }

@@ -14,6 +14,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import com.vatsul.awatcher.JikanAPI;
 import com.vatsul.awatcher.Main;
 import com.vatsul.awatcher.MalApi;
 import com.vatsul.awatcher.Utils;
@@ -519,7 +520,7 @@ public class Gui extends Application {
 				final int myStatusToUpdateToFinal = myStatusToUpdateTo;
 				new Thread(() -> {
 					MalApi.updateAnimeListStatusScore(selectedMalID, myStatusToUpdateToFinal, score);
-					MalApi.updateMyAnimeList();
+					JikanAPI.updateMyAnimeList();
 					updateMalRowData();
 				}).start();
 			}
@@ -534,7 +535,7 @@ public class Gui extends Application {
 				new Thread(() -> {
 					malBtnBox.setDisable(true);
 					MalApi.updateAnimeListWatchedEpisodes(selectedMalID, selectedWatchedEps+1);
-					MalApi.updateMyAnimeList();
+					JikanAPI.updateMyAnimeList();
 					updateMalRowData();
 					malBtnBox.setDisable(false);
 				}).start();
@@ -550,7 +551,7 @@ public class Gui extends Application {
 				new Thread(() -> {
 					malBtnBox.setDisable(true);
 					MalApi.updateAnimeListWatchedEpisodes(selectedMalID, selectedWatchedEps-1);
-					MalApi.updateMyAnimeList();
+					JikanAPI.updateMyAnimeList();
 					updateMalRowData();
 					malBtnBox.setDisable(false);
 				}).start();
@@ -891,7 +892,7 @@ public class Gui extends Application {
 		for(int i=0; i<malIDs.size(); i++) {
 			String startDate = startDates.get(i);
 			try {
-				if(startDate.equals("0000-00-00")) {
+				if(startDate.equals("null") || startDate.equals("0000-00-00")) {
 					startDatesMilliseconds.add(new Long(0));
 				} else {
 					startDatesMilliseconds.add(new SimpleDateFormat("yyyy-MM-dd").parse(startDate).getTime());
@@ -965,9 +966,9 @@ public class Gui extends Application {
 		Platform.runLater(() -> progressLbl.setText("Updating MALIDs..."));
 		Indexer.updateMalids();
 		Platform.runLater(() -> progressLbl.setText("Updating MyAnimeList..."));
-		MalApi.updateMyAnimeList();
+		JikanAPI.updateMyAnimeList();
 		Platform.runLater(() -> progressLbl.setText("Caching Synopses..."));
-		MalApi.cacheSynopsesToDB();
+		JikanAPI.cacheSynopsesToDB();
 		Platform.runLater(() -> progressLbl.setText("Caching Thumbnails..."));
 		Indexer.cacheThumbnails();
 		Platform.runLater(() -> topProgressBar.setProgress(1));

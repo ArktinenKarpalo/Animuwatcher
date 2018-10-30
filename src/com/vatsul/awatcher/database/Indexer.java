@@ -90,7 +90,7 @@ public class Indexer {
 				ArrayList<String> searchStrings = new ArrayList<String>();
 				searchStrings.add(database.getAidTitle(aid));
 				searchStrings.addAll(Arrays.asList(database.getSynonymList(aid)));
-				int malID = MalApi.getMalID(searchStrings);
+				int malID = JikanAPI.getMalID(searchStrings);
 				if(malID>0) {
 					database.updateMalID(aid, malID);
 				}
