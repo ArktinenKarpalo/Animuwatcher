@@ -22,7 +22,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import com.vatsul.awatcher.Hashes;
-import com.vatsul.awatcher.MalApi;
+import com.vatsul.awatcher.JikanAPI;
 import com.vatsul.awatcher.anidbapi.Amask;
 import com.vatsul.awatcher.anidbapi.AnidbConnection;
 import com.vatsul.awatcher.anidbapi.AnidbHTTPApi;

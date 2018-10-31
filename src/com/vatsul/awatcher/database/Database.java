@@ -22,6 +22,11 @@ public class Database {
 	public Ed2kHashes Ed2kHashes;
 
 	public Database() {
+		try {
+			Class.forName("org.sqlite.JDBC");
+		} catch (ClassNotFoundException e1) {
+			e1.printStackTrace();
+		}
 		MyAnimeList = new MyAnimeList();
 		Ed2kHashes = new Ed2kHashes();
 		try(Connection dbConn = DriverManager.getConnection(databaseFilepath)) {

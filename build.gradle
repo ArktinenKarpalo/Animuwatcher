@@ -1,0 +1,64 @@
+apply plugin: "java"
+apply plugin: "maven"
+apply plugin: "com.github.johnrengelman.shadow"
+
+group = "Animuwatch"
+version = ""
+
+description = """Animuwatch"""
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+sourceSets {
+	main {
+		java {
+			srcDirs = ["src/com/vatsul/awatcher"]
+		}
+	}
+}
+
+jar {
+	manifest {
+		attributes "Main-Class": "com.vatsul.awatcher.Main"
+	}
+	destinationDir = file("$rootDir/build")
+}
+
+shadowJar {
+	manifest {
+		attributes( "Main-Class": "com.vatsul.awatcher.Main",
+		"Class-Path": ".")
+	}
+	from("etc") {
+		include "style.css"
+		include "Ubuntu-R.ttf"
+	}
+	from("etc/icons") {
+		include "*.png"	
+	}
+	destinationDir = file("$rootDir/build")
+	minimize {
+		exclude(dependency("org.xerial:sqlite-jdbc:3.25.2"))
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+buildscript {
+	repositories {
+		jcenter()
+	}
+	dependencies {
+		classpath "com.github.jengelman.gradle.plugins:shadow:4.0.2"
+	}
+}
+
+dependencies {
+	compile group: "org.json", name: "json", version:"20180813"
+	compile group: "org.xerial", name: "sqlite-jdbc", version:"3.25.2"
+	compile group: "org.gnu", name: "gnu-crypto", version: "2.0.1"
+	compile group: "org.unbescape", name: "unbescape", version: "1.0"
+}
