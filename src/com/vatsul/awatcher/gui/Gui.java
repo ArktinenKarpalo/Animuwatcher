@@ -274,6 +274,7 @@ public class Gui extends Application {
 		topToolBar.getItems().add(playBtn);
 		
 		ToggleButton listenMediaplayers = new ToggleButton("Toggle autoview");
+		listenMediaplayers.setDisable(true); // Currently not working due to official MAL API being unavailable§
 		listenMediaplayers.setTooltip(new Tooltip("Toggle to listen running mediaplayer instances for running episodes"));
 		listenMediaplayers.setSelected(Main.config.getListenMediaplayers());
 		listenMediaplayers.setOnAction(new EventHandler<ActionEvent>() {
@@ -495,6 +496,7 @@ public class Gui extends Application {
 		malBtnBox.getChildren().add(myScoreBox);
 		
 		Button updateMalBtn = new Button("Update");
+		updateMalBtn.setDisable(true); // Currently not working due to official MAL API being unavailable
 		updateMalBtn.setTooltip(new Tooltip("Update the given data to MyAnimeList"));
 		updateMalBtn.setOnAction(new EventHandler<ActionEvent>() {	
 			@Override
@@ -528,6 +530,7 @@ public class Gui extends Application {
 		malBtnBox.getChildren().add(updateMalBtn);
 		
 		Button watchedBtn = new Button("+");
+		watchedBtn.setDisable(true); // Currently not working due to official MAL API being unavailable
 		watchedBtn.setTooltip(new Tooltip("Mark next episode as watched"));
 		watchedBtn.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
@@ -544,6 +547,7 @@ public class Gui extends Application {
 		malBtnBox.getChildren().add(watchedBtn);
 		
 		Button notWatchedBtn = new Button("-");
+		notWatchedBtn.setDisable(true); // Currently not working due to official MAL API being unavailable
 		notWatchedBtn.setTooltip(new Tooltip("Mark previous episode as not watched"));
 		notWatchedBtn.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
