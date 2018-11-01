@@ -3,5 +3,6 @@
 .idea
 .project
 .gradle
+/gradle
 /build
 /bin
