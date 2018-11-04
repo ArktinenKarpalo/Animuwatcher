@@ -1,26 +1,5 @@
 package com.vatsul.awatcher;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.ConnectException;
-import java.net.HttpURLConnection;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.ArrayList;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.w3c.dom.DOMException;
-import org.w3c.dom.Document;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
-
-import com.vatsul.awatcher.gui.Gui;
-
 public class VlcConnect extends Thread {
 	/*
 	 * Enable VLC HTTP interface from Preferences -> All -> Interface -> Main interfaces -> Web
@@ -36,6 +15,7 @@ public class VlcConnect extends Thread {
 	 * of that series that user has not watched yet, if it is then mark it as watched and add the file name to ignore list
 	 * Make the % of episode watched when it is marked as watched customizable
 	 */
+	/*
 	public void run() {
 		ArrayList<String> markedFilepaths = new ArrayList<String>();
 		while(true) {
@@ -130,5 +110,5 @@ public class VlcConnect extends Thread {
 		}
 		// No valid entry found
 		return null;
-	}	
+	}*/
 }

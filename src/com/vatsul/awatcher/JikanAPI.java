@@ -1,29 +1,18 @@
 package com.vatsul.awatcher;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.JSONTokener;
+
+import javax.net.ssl.HttpsURLConnection;
 import java.io.IOException;
-import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
-import java.util.zip.GZIPInputStream;
-
-import javax.net.ssl.HttpsURLConnection;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.JSONTokener;
-import org.w3c.dom.DOMException;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
 public class JikanAPI {
 	
@@ -41,89 +30,107 @@ public class JikanAPI {
 		}
 	}
 
-	// Update MyAnimeList table in database with values of users animelist from Jikan
-		public static void updateMyAnimeList() {
-			try {
-				ArrayList<Integer> malID = new ArrayList<Integer>();
-				ArrayList<String> title = new ArrayList<String>();
-				ArrayList<Integer> type = new ArrayList<Integer>();
-				ArrayList<Integer> episodes = new ArrayList<Integer>();
-				ArrayList<Integer> status = new ArrayList<Integer>();
-				ArrayList<Integer> watchedEpisodes = new ArrayList<Integer>();
-				ArrayList<Integer> myScore = new ArrayList<Integer>();
-				ArrayList<Integer> myStatus = new ArrayList<Integer>();
-				ArrayList<String> thumbnail = new ArrayList<String>();
-				ArrayList<String> startDate = new ArrayList<String>();
-				ArrayList<Integer> lastUpdated = new ArrayList<Integer>();
-				int pageCnt = 1;
-				while(true) {
-					URL url = new URL(JikanURL + "/user/" + Main.config.getMalUsername() + "/animelist/all/" + pageCnt);
+	// Does not update data for MalIDs that already exist in MalAnimeData table
+	public static void updateNewMALIDData() {
+		List<Integer> malIds = Main.database.MALIDs.getMalIDs();
+		String title="", type="", status="", thumbnail="", startDate="", synopsis="";
+		int episodes = -1;
+		for(int i=0; i<malIds.size(); i++) {
+			if(Main.database.MalAnimeData.getTitleByMalID(malIds.get(i)) == null) {
+				try {
+					URL url = new URL(JikanURL + "/anime/" + malIds.get(i));
 					maintainRatelimit();
-					HttpsURLConnection conn = (HttpsURLConnection)url.openConnection();
+					HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
 					conn.setRequestMethod("GET");
 					conn.connect();
-					JSONTokener tokener = new JSONTokener(conn.getInputStream());
-					JSONObject obj = new JSONObject(tokener);
+					JSONObject obj = new JSONObject(new JSONTokener(conn.getInputStream()));
 					if(!obj.getBoolean("request_cached")) {
 						lastQuery = System.currentTimeMillis();
 					}
-					JSONArray anime = obj.getJSONArray("anime");
-					if(anime.length() == 0)
-						break;
-					anime.forEach(a -> {
-						JSONObject cur = (JSONObject) a;
-						malID.add(cur.getInt("mal_id"));
-						title.add(cur.getString("title"));
-						String curType = cur.getString("type");
-						if(curType.equals("TV")) {
-							type.add(1);
-						} else if(curType.equals("OVA")) {
-							type.add(2);
-						} else if(curType.equals("Movie")) {
-							type.add(3);
-						} else if(curType.equals("ONA")) {
-							type.add(5);
-						} else {
-							type.add(4);
-						}
-						episodes.add(cur.getInt("total_episodes"));
-						status.add(cur.getInt("airing_status"));
-						watchedEpisodes.add(cur.getInt("watched_episodes"));
-						myScore.add(cur.getInt("score"));
-						myStatus.add(cur.getInt("watching_status"));
-						thumbnail.add(cur.getString("image_url"));
-						startDate.add(cur.get("start_date").toString());
-						lastUpdated.add(0); // Not available from Jikan
-					});
-					pageCnt++;
-				}
-				Main.database.MyAnimeList.updateMyAnimeList(malID, title, type, episodes, status, watchedEpisodes, myScore, myStatus, thumbnail, startDate, lastUpdated);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		
-		// Cache synopses from MAL into database of aids that already exist in the database
-		public static void cacheSynopsesToDB() {
-			for(Integer malID : Main.database.MyAnimeList.getAllMalIDs()) {
-				if(Main.database.MyAnimeList.getSynopsisByMalID(malID)==null) {
 					try {
-						URL url = new URL(JikanURL + "/anime/" + malID);
-						System.out.println(url.toString());
-						HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
-						con.setRequestMethod("GET");
-						con.setReadTimeout(5000);
-						maintainRatelimit();
-						JSONObject obj = new JSONObject(new JSONTokener(con.getInputStream()));
-						Main.database.MyAnimeList.updateSynopsisByMalID(malID, obj.getString("synopsis"));
+						title = obj.getString("title");
 					} catch (JSONException e) {
-						System.out.println("Error! Could not find synopsis for " + malID + "!");
-					} catch (IOException e) {
-						e.printStackTrace();
+						title = null;
 					}
+					try {
+						type = obj.getString("type");
+					} catch (JSONException e) {
+						type = null;
+					}
+					try {
+						status = obj.getString("status");
+					} catch (JSONException e) {
+						status = null;
+					}
+					try {
+						thumbnail = obj.getString("image_url");
+					} catch (JSONException e) {
+						thumbnail = null;
+					}
+					try {
+						startDate = obj.getJSONObject("aired").getString("from");
+					} catch (JSONException e) {
+						startDate = null;
+					}
+					try {
+						synopsis = obj.getString("synopsis");
+					} catch (JSONException e) {
+						synopsis = null;
+					}
+					try {
+						episodes = obj.getInt("episodes");
+					} catch (JSONException e) {
+						episodes = -1;
+					}
+				} catch (MalformedURLException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
+					e.printStackTrace();
 				}
+				Main.database.MalAnimeData.updateMalAnimeData(malIds.get(i), title, type, episodes, status, thumbnail, startDate, synopsis);
 			}
 		}
+	}
+
+	// Update MyAnimeList table in database with values of users animelist from Jikan
+	public static void updateMyAnimeList() {
+		try {
+			ArrayList<Integer> malID = new ArrayList<Integer>();
+			ArrayList<Integer> watchedEpisodes = new ArrayList<Integer>();
+			ArrayList<Integer> myScore = new ArrayList<Integer>();
+			ArrayList<Integer> myStatus = new ArrayList<Integer>();
+			int pageCnt = 1;
+			while(true) {
+				URL url = new URL(JikanURL + "/user/" + Main.config.getMalUsername() + "/animelist/all/" + pageCnt);
+				maintainRatelimit();
+				HttpsURLConnection conn = (HttpsURLConnection)url.openConnection();
+				conn.setRequestMethod("GET");
+				conn.connect();
+				JSONTokener tokener = new JSONTokener(conn.getInputStream());
+				JSONObject obj = new JSONObject(tokener);
+				if(!obj.getBoolean("request_cached")) {
+					lastQuery = System.currentTimeMillis();
+				}
+				JSONArray anime = obj.getJSONArray("anime");
+				if(anime.length() == 0)
+					break;
+				anime.forEach(a -> {
+					JSONObject cur = (JSONObject) a;
+					malID.add(cur.getInt("mal_id"));
+					String curType = cur.getString("type");
+					watchedEpisodes.add(cur.getInt("watched_episodes"));
+					myScore.add(cur.getInt("score"));
+					myStatus.add(cur.getInt("watching_status"));
+				});
+				pageCnt++;
+			}
+			for(int id:malID)
+				Main.database.MALIDs.addMalID(id);
+			Main.database.MyAnimeList.updateMyAnimeList(malID, myStatus, myScore, watchedEpisodes);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 		
 		// Returns malID of anime if found on MAL List of names and/or synonyms as an input
 		public static int getMalID(List<String> searchStrings) {
@@ -137,8 +144,10 @@ public class JikanAPI {
 					JSONTokener tokener = new JSONTokener(con.getInputStream());
 					JSONObject obj = new JSONObject(tokener);
 					JSONArray results = obj.getJSONArray("results");
-					if(results.length() == 1)
-						return ((JSONObject)results.get(0)).getInt("mal_id");
+					if(results.length() == 1) {
+						Main.database.MALIDs.addMalID(((JSONObject)results.get(0)).getInt("mal_id"));
+						return ((JSONObject) results.get(0)).getInt("mal_id");
+					}
 				} catch (SocketTimeoutException e2) {
 					System.out.println("MAL API Timeout - " + s);
 				} catch (IOException e) {

@@ -1,25 +1,9 @@
 package com.vatsul.awatcher.gui;
 
-import java.awt.Desktop;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-
+import com.vatsul.awatcher.Indexer;
 import com.vatsul.awatcher.JikanAPI;
 import com.vatsul.awatcher.Main;
-import com.vatsul.awatcher.MalApi;
 import com.vatsul.awatcher.Utils;
-import com.vatsul.awatcher.database.Indexer;
-
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
@@ -35,39 +19,34 @@ import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.ComboBox;
+import javafx.scene.control.*;
 import javafx.scene.control.Dialog;
-import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.ProgressBar;
-import javafx.scene.control.Separator;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
 import javafx.scene.control.TabPane.TabClosingPolicy;
-import javafx.scene.control.TableCell;
-import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellDataFeatures;
-import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.control.ToggleButton;
-import javafx.scene.control.ToolBar;
-import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 import javafx.util.Callback;
+
+import java.awt.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Optional;
 
 public class Gui extends Application {
 	
@@ -155,7 +134,7 @@ public class Gui extends Application {
 		welcomeLbl.setWrapText(true);
 		welcomeDialog.getDialogPane().setContent(welcomeLbl);
 		
-		welcomeDialog.showAndWait();
+		//welcomeDialog.showAndWait();
 	}
 	
 	private ToolBar topToolBar() {
@@ -221,13 +200,13 @@ public class Gui extends Application {
 			@Override
 			public void handle(ActionEvent event) {
 				if(selectedMalID>0) {
-					int aid = Main.database.getAid(selectedMalID);
+					int aid = Main.database.AniDBAnimeTable.getAid(selectedMalID);
 					int epNum = selectedWatchedEps;
 					ArrayList<File> playlist = new ArrayList<File>();
 					int i = 0;
 					while(true) {
 						i++;
-						File nextEpisode = Main.database.getFileByAidEp(aid, epNum+i);
+						File nextEpisode = Main.database.FileTable.getFileByAidEp(aid, epNum+i);
 						if(nextEpisode!=null) {
 							playlist.add(nextEpisode);
 						} else {
@@ -501,6 +480,7 @@ public class Gui extends Application {
 		updateMalBtn.setOnAction(new EventHandler<ActionEvent>() {	
 			@Override
 			public void handle(ActionEvent event) {
+				/*
 				int myStatusToUpdateTo = 0;
 				if(myStatusBox.getValue().equals("Watching")) {
 					myStatusToUpdateTo = 1;
@@ -524,7 +504,7 @@ public class Gui extends Application {
 					MalApi.updateAnimeListStatusScore(selectedMalID, myStatusToUpdateToFinal, score);
 					JikanAPI.updateMyAnimeList();
 					updateMalRowData();
-				}).start();
+				}).start();*/
 			}
 		});
 		malBtnBox.getChildren().add(updateMalBtn);
@@ -535,13 +515,13 @@ public class Gui extends Application {
 		watchedBtn.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				new Thread(() -> {
+				/*new Thread(() -> {
 					malBtnBox.setDisable(true);
 					MalApi.updateAnimeListWatchedEpisodes(selectedMalID, selectedWatchedEps+1);
 					JikanAPI.updateMyAnimeList();
 					updateMalRowData();
 					malBtnBox.setDisable(false);
-				}).start();
+				}).start();*/
 			}
 		});
 		malBtnBox.getChildren().add(watchedBtn);
@@ -552,13 +532,13 @@ public class Gui extends Application {
 		notWatchedBtn.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				new Thread(() -> {
+				/*new Thread(() -> {
 					malBtnBox.setDisable(true);
 					MalApi.updateAnimeListWatchedEpisodes(selectedMalID, selectedWatchedEps-1);
 					JikanAPI.updateMyAnimeList();
 					updateMalRowData();
 					malBtnBox.setDisable(false);
-				}).start();
+				}).start();*/
 			}
 		});
 		malBtnBox.getChildren().add(notWatchedBtn);
@@ -770,9 +750,9 @@ public class Gui extends Application {
 				if(newValue!=null) {
 					int malID = newValue.getMalID();
 					int myStatus = Main.database.MyAnimeList.getMyStatusMalID(malID);
-					File thumbnailFile = Main.database.MyAnimeList.getThumbnail(malID);
+					File thumbnailFile = Main.database.MalAnimeData.getThumbnail(malID);
 					thumbnail.setImage(new Image("file:cache/malthumbnails/"+thumbnailFile.getName()));
-					String description = Main.database.MyAnimeList.getSynopsisByMalID(malID);
+					String description = Main.database.MalAnimeData.getSynopsisByMalID(malID);
 					description = description.replaceAll("<.*?>|\\[.*?]", "");
 					description = org.unbescape.html.HtmlEscape.unescapeHtml(description);
 					descriptionArea.setText(description);
@@ -884,19 +864,24 @@ public class Gui extends Application {
 	private static ObservableList<MalRow> getMalRowsByMyStatus(int myStatus) {
 		ArrayList<ArrayList> data = Main.database.MyAnimeList.getAnimeDataForTableByMyStatus(myStatus);
 		ArrayList<Integer> malIDs = data.get(0);
-		ArrayList<String> titles = data.get(1);
-		ArrayList<Integer> types = data.get(2);
-		ArrayList<Integer> totalEpisodes = data.get(3);
-		ArrayList<Integer> watchedEpisodes = data.get(4);
-		ArrayList<Integer> myScores = data.get(5);
-		ArrayList<String> startDates = data.get(6);
+		ArrayList<Integer> watchedEpisodes = data.get(1);
+		ArrayList<Integer> myScores = data.get(2);
+
+		ArrayList<String> titles = new ArrayList<>();
+		ArrayList<String> types = new ArrayList<>();
+		ArrayList<Integer> totalEpisodes = new ArrayList<>();
+		ArrayList<String> startDates = new ArrayList<>();
+
 		ArrayList<Long> startDatesMilliseconds = new ArrayList<Long>();
-		ArrayList<Integer> lastUpdated = data.get(7);
 		final ObservableList<MalRow> malRows = FXCollections.observableArrayList();
 		for(int i=0; i<malIDs.size(); i++) {
-			String startDate = startDates.get(i);
+			ArrayList<Object> list = Main.database.MalAnimeData.getAnimeDataForTableByMalID(malIDs.get(i));
+			if(list == null)
+				continue;
+
+			String startDate = (String)list.get(3);
 			try {
-				if(startDate.equals("null") || startDate.equals("0000-00-00")) {
+				if(startDate == null || startDate.equals("0000-00-00")) {
 					startDatesMilliseconds.add(new Long(0));
 				} else {
 					startDatesMilliseconds.add(new SimpleDateFormat("yyyy-MM-dd").parse(startDate).getTime());
@@ -904,21 +889,9 @@ public class Gui extends Application {
 			} catch (ParseException e) {
 				e.printStackTrace();
 			}
-			
-			String type = "-";
-			if(types.get(i)==1) {
-				type = "TV";
-			} else if(types.get(i)==2) {
-				type = "OVA";
-			} else if(types.get(i)==3) {
-				type = "Movie";
-			} else if(types.get(i)==4) {
-				type = "Special";
-			} else if(types.get(i)==5) {
-				type = "ONA";
-			}
-			malRows.add(new MalRow(malIDs.get(i), titles.get(i), startDatesMilliseconds.get(i), watchedEpisodes.get(i),
-					totalEpisodes.get(i), myScores.get(i), type, lastUpdated.get(i)));
+
+			malRows.add(new MalRow(malIDs.get(i), (String)list.get(0), startDatesMilliseconds.get(i), watchedEpisodes.get(i),
+					(Integer)list.get(2), myScores.get(i), (String)list.get(1), 0));
 		}
 		return malRows;
 	}
@@ -971,8 +944,8 @@ public class Gui extends Application {
 		Indexer.updateMalids();
 		Platform.runLater(() -> progressLbl.setText("Updating MyAnimeList..."));
 		JikanAPI.updateMyAnimeList();
-		Platform.runLater(() -> progressLbl.setText("Caching Synopses..."));
-		JikanAPI.cacheSynopsesToDB();
+		Platform.runLater(() -> progressLbl.setText("Updating Anime data from MAL..."));
+		JikanAPI.updateNewMALIDData();
 		Platform.runLater(() -> progressLbl.setText("Caching Thumbnails..."));
 		Indexer.cacheThumbnails();
 		Platform.runLater(() -> topProgressBar.setProgress(1));
